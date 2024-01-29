@@ -9,6 +9,8 @@ const buttonScore1 = document.querySelector('.score1')!;
 const buttonScore2 = document.querySelector('.score2')!;
 const buttonScore3 = document.querySelector('.score3')!;
 const buttonJoke = document.querySelector('.buttonJoke')!;
+const blobSecundari = document.querySelector('.blobSecundari')!;
+const blobSecundari2 = document.querySelector('.blobSecundari2')!;
 
 let puntuacio: number;
 let currentJokeIndex: number;
@@ -19,15 +21,16 @@ let reportAcudits: {
     date: string,
 }[] = [];
 
+setBlob();
+getWeather();
 getJoke();
 // Botó obtenir nova broma
 buttonJoke.addEventListener('click', function (){
     getJoke();
 })
-// Mostra l'icona de l'estat del temps i la temperatura
-getWeather();
 
 async function getJoke(){
+    // Cridem un dels dos APIS de bromes de manera aleatoria
     const request = new Request (Math.random() < 0.5 ? urlJokes : urlJokes2, {
         headers: {
             'Accept': 'application/json'
@@ -37,7 +40,7 @@ async function getJoke(){
     const data = await response.json();
     console.log(data.joke);
     displayJoke.textContent = `\"${data.joke}\"`;
-
+    
     //Guardem la broma en l'array reportAcudits si no hi és
     const jaHies = reportAcudits.findIndex((acudit) => acudit.joke === data.joke)
     if (jaHies != -1) {
@@ -66,7 +69,6 @@ buttonScore3.addEventListener('click', function(){
     console.log(reportAcudits);
 })
 
-
 // Afegeix un acudit a l'array reportAcudits amb la data actual i puntuació 0 (⚠️0 conta com a no puntuació)
 function afegirAcudit(acudit: string): void {
     const date = new Date();
@@ -75,18 +77,38 @@ function afegirAcudit(acudit: string): void {
     currentJokeIndex = reportAcudits.length -1;
     console.log(`Current joke: ${currentJokeIndex}`);
 }
+// Defineix el 'blob' del fons seleccionnant dels 6 disponibles
+//⚠️ falta refactoritzar i simplificar
+function setBlob(){
+    let blobs = [1,2,3,4,5,6];
+    let blobPrimari = blobs[Math.floor(Math.random()*6)];
+    console.log(blobPrimari);
+    let urlBlob = `./images/blob${blobPrimari}.png`
+    document.body.style.backgroundImage = `url(${urlBlob})`;
+    //Eliminem de l'array d'opcions el blob primari perquè no es repeteixin
+    blobs.splice(blobPrimari-1, 1);
+    console.log(`Array blobs: ${blobs}`);
+    let blobSec = blobs[Math.floor(Math.random()*6)];
+    blobSecundari.setAttribute('src', `./images/blob${blobSec}.png`);
+    //Eliminem de l'array d'opcions el blob 2 i generem el 3
+    blobs.splice(blobPrimari-1, 1);
+    console.log(`Array blobs: ${blobs}`);
+    let blobSec2 = blobs[Math.floor(Math.random()*6)];
+    blobSecundari2.setAttribute('src', `./images/blob${blobSec2}.png`);
+}
 
+// Mostra l'icona de l'estat del temps i la temperatura
 async function getWeather(){
     const options = {};
     const request = new Request (urlWeather, options)
     const response = await fetch (request);
     const data = await response.json();
     console.log(data);
-
+    
     const iconURL = `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
+    weatherIcon.setAttribute('alt', data.weather[0].description);
     weatherIcon.setAttribute('src', iconURL);
     displayTemp.textContent = `${Math.round(data.main.temp*10)/10} ºC`;
-    // displayWeather.textContent = `Avui: ${data.weather[0].description}`;
 }
 
 

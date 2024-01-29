@@ -18,18 +18,21 @@ const buttonScore1 = document.querySelector('.score1');
 const buttonScore2 = document.querySelector('.score2');
 const buttonScore3 = document.querySelector('.score3');
 const buttonJoke = document.querySelector('.buttonJoke');
+const blobSecundari = document.querySelector('.blobSecundari');
+const blobSecundari2 = document.querySelector('.blobSecundari2');
 let puntuacio;
 let currentJokeIndex;
 let reportAcudits = [];
+setBlob();
+getWeather();
 getJoke();
 // Botó obtenir nova broma
 buttonJoke.addEventListener('click', function () {
     getJoke();
 });
-// Mostra l'icona de l'estat del temps i la temperatura
-getWeather();
 function getJoke() {
     return __awaiter(this, void 0, void 0, function* () {
+        // Cridem un dels dos APIS de bromes de manera aleatoria
         const request = new Request(Math.random() < 0.5 ? urlJokes : urlJokes2, {
             headers: {
                 'Accept': 'application/json'
@@ -75,6 +78,26 @@ function afegirAcudit(acudit) {
     currentJokeIndex = reportAcudits.length - 1;
     console.log(`Current joke: ${currentJokeIndex}`);
 }
+// Defineix el 'blob' del fons seleccionnant dels 6 disponibles
+//⚠️ falta refactoritzar i simplificar
+function setBlob() {
+    let blobs = [1, 2, 3, 4, 5, 6];
+    let blobPrimari = blobs[Math.floor(Math.random() * 6)];
+    console.log(blobPrimari);
+    let urlBlob = `./images/blob${blobPrimari}.png`;
+    document.body.style.backgroundImage = `url(${urlBlob})`;
+    //Eliminem de l'array d'opcions el blob primari perquè no es repeteixin
+    blobs.splice(blobPrimari - 1, 1);
+    console.log(`Array blobs: ${blobs}`);
+    let blobSec = blobs[Math.floor(Math.random() * 6)];
+    blobSecundari.setAttribute('src', `./images/blob${blobSec}.png`);
+    //Eliminem de l'array d'opcions el blob 2 i generem el 3
+    blobs.splice(blobPrimari - 1, 1);
+    console.log(`Array blobs: ${blobs}`);
+    let blobSec2 = blobs[Math.floor(Math.random() * 6)];
+    blobSecundari2.setAttribute('src', `./images/blob${blobSec2}.png`);
+}
+// Mostra l'icona de l'estat del temps i la temperatura
 function getWeather() {
     return __awaiter(this, void 0, void 0, function* () {
         const options = {};
@@ -83,8 +106,8 @@ function getWeather() {
         const data = yield response.json();
         console.log(data);
         const iconURL = `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
+        weatherIcon.setAttribute('alt', data.weather[0].description);
         weatherIcon.setAttribute('src', iconURL);
         displayTemp.textContent = `${Math.round(data.main.temp * 10) / 10} ºC`;
-        // displayWeather.textContent = `Avui: ${data.weather[0].description}`;
     });
 }
